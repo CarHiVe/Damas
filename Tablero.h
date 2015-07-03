@@ -11,6 +11,7 @@
 #include <iostream>
 #include <list>
 #include <locale>
+#include <unistd.h>
 using namespace std;
 
 class Tablero {
@@ -32,11 +33,17 @@ public:
     bool juegoTerminado(bool player);
     int signo(int f);
     bool equals(const Tablero& t);
-    list<Tablero> getMovReina(int iX, int iY, int fX, int fY, int direccion);
+    int enDiagonal(int i, int j, int x, int y);
+    list<Tablero> getEatReina(int i, int j);
     
     wchar_t tablero[10][10];
     int tablero2[10][10];
     int comer;
+    int ValPieza;
+    int X1;
+    int Y1;
+    int X2;
+    int Y2;
 };
 
 #endif	/* TABLERO_H */

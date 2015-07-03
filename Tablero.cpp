@@ -4,6 +4,11 @@
 Tablero::Tablero() {
     setlocale(LC_CTYPE,"");
     comer = 0;
+    /*ValPieza = 0;
+    X1 = 0;
+    Y1 = 0;
+    X2 = 0;
+    Y2 = 0;*/
     for(int i=0;i<10;i++){
         for(int j=0;j<10;j++){
             if(i<3 && (i+j)%2 != 0){
@@ -26,6 +31,11 @@ Tablero::Tablero() {
 
 Tablero::Tablero(const Tablero& orig) {
     comer = orig.comer;
+    ValPieza = orig.ValPieza;
+    X1 = orig.X1;
+    Y1 = orig.Y1;
+    X2 = orig.X2;
+    Y2 = orig.Y2;
     for(int i=0;i<10;i++){
         for(int j=0;j<10;j++){
             tablero[i][j] = orig.tablero[i][j];
@@ -43,97 +53,83 @@ Tablero::Tablero(const Tablero& t, int I, int J, int codigo){
         }
     }
     
-    int valorInt= tablero2[I][J];
+    int valorInt = tablero2[I][J];
     wchar_t valorChar = tablero[I][J];
+    
+    ValPieza = valorInt;
+    X1 = I;
+    Y1 = J;
     
     tablero[I][J] = '-';
     tablero2[I][J] = 0;
     
     switch(codigo){
         case(0):
-            I--;
-            J--;
+            I = I - 1;
+            J = J - 1;
             comer = 0;
             break;
             
         case(1):
-            I--;
-            J++;
+            I = I-1;
+            J = J+1;
             comer = 0;
             break;
             
         case(2):
-            I++;
-            J--;
+            I = I+1;
+            J = J-1;
             comer = 0;
             break;
             
         case(3):
-            I++;
-            J++;
+            I = I+1;
+            J = J+1;
             comer = 0;
             break;
             
         case(4):
             tablero[I-1][J-1] = '-';
             tablero2[I-1][J-1] = 0;
-            if(valorInt == 2)
-                comer = 2;
-            else
-                comer = 1;
-            I-=2;
-            J-=2;
+            comer = 2;
+            I = I-2;
+            J = J-2;
             break;
             
         case(5):
             tablero[I-1][J+1] = '-';
             tablero2[I-1][J+1] = 0;
-            if(valorInt == 2)
-                comer = 2;
-            else
-                comer = 1;
-            I-=2;
-            J+=2;
+            comer = 2;
+            I = I-2;
+            J = J+2;
             break;
             
         case(6):
             tablero[I+1][J-1] = '-';
             tablero2[I+1][J-1] = 0;
-            if(valorInt == 2)
-                comer = 2;
-            else
-                comer = 1;
-            I+=2;
-            J-=2;
+            comer = 2;
+            I = I+2;
+            J = J-2;
             break;
             
         case(7):
             tablero[I+1][J+1] = '-';
             tablero2[I+1][J+1] = 0;
-            if(valorInt == 2)
-                comer = 2;
-            else
-                comer = 1;
-            I+=2;
-            J+=2;
+            comer = 2;
+            I = I+2;
+            J = J+2;
             break;
             
         case(8):
             valorInt = 0;
             valorChar = '-';
-            if(valorInt == 2)
-                comer = 2;
-            else
-                comer = 1;
-            break;
-            
         default:
             break;
     }
-    
+    X2 = I;
+    Y2 = J;
     tablero[I][J] = valorChar;
     tablero2[I][J] = valorInt;
-    
     
     if(I==9 && valorInt == -1){
         tablero[I][J] = 9819;
@@ -146,7 +142,7 @@ Tablero::Tablero(const Tablero& t, int I, int J, int codigo){
 }
 
 Tablero::Tablero(const Tablero& t, int I1, int J1, int I2, int J2, int codigo){
-     setlocale(LC_CTYPE,"");
+    setlocale(LC_CTYPE,"");
     for(int i=0;i<10;i++){
         for(int j=0;j<10;j++){
             tablero[i][j] = t.tablero[i][j];
@@ -236,7 +232,7 @@ list<Tablero> Tablero::getMovimiento(bool player){
     
     for(int i=0;i<10;i++){
         for(int j=0;j<10;j++){
-            if((player && tablero2[i][j] > 0) || (!player && tablero2[i][j] < 0)){
+            if((player && tablero2[i][j] == 1) || (!player && tablero2[i][j] == -1)){
                 list<Tablero> aux; 
                 aux.operator=(this->getSalto(i, j, tablero2[i][j], 4));
                 list<Tablero>::iterator ini = aux.begin();
@@ -245,6 +241,18 @@ list<Tablero> Tablero::getMovimiento(bool player){
                 while(ini != fin){
                     moves.push_back(*ini);
                     ini++;
+                }
+            }else{
+                if((player && tablero2[i][j] == 2) || (!player && tablero2[i][j] == -2)){
+                    list <Tablero> aux;
+                    aux.operator=(this->getEatReina(i, j));
+                    list<Tablero>::iterator ini = aux.begin();
+                    list<Tablero>::iterator fin = aux.end();
+                    
+                    while(ini != fin){
+                        moves.push_back(*ini);
+                        ini++;
+                    }
                 }
             }
         }
@@ -532,7 +540,6 @@ list<Tablero> Tablero::getSaltoDerivado(int i, int j, int direccion){
     return moves;
 }
 
-
 list<Tablero> Tablero::getMovimientoDerivado(int i, int j, int direccion){
     list<Tablero> moves;
     
@@ -650,9 +657,14 @@ Tablero& Tablero::operator =(const Tablero& t){
                 this->tablero2[i][j] = t.tablero2[i][j];
             }
         }
+        this->X1 = t.X1;
+        this->Y1 = t.Y1;
+        this->X2 = t.X2;
+        this->Y2 = t.Y2;
+        this->comer = t.comer;
+        this->ValPieza = t.ValPieza;
     }
     
-    this->comer = t.comer;
     return *this;
 }
 
@@ -683,69 +695,139 @@ bool Tablero::equals(const Tablero& t){
     return true;
 }
 
-list<Tablero> Tablero::getMovReina(int iX, int iY, int fX, int fY, int direccion){
-    list<Tablero> moves;
+int Tablero::enDiagonal(int i, int j, int x, int y){
+    int distanciaX = x-i;
+    int distanciaY = y-j;
     
-    if(iX != fX && iY != fY){
-        if(abierto(iX-1, iY-1) && direccion == 0){
-            Tablero nuevoTablero = Tablero(*this, iX,iY,0);
-            list<Tablero> der;
-            der.operator=(nuevoTablero.getMovReina(iX-1, iY-1, fX, fY, direccion));  
-            if(der.empty())
-                moves.push_back(nuevoTablero);
-            else{
-                list<Tablero>::iterator ini = der.begin();
-                list<Tablero>::iterator fin = der.end();
-                while(ini != fin){
-                    moves.push_back(*ini);
-                    ini++;
+    if(distanciaX < 0)
+        distanciaX*=-1;
+    
+    if(distanciaY < 0)
+        distanciaY*=-1;
+    
+    if(distanciaX == distanciaY)
+        return distanciaX;
+    
+    return 0;
+}
+
+list<Tablero> Tablero::getEatReina(int i, int j){
+    list<Tablero> moves;
+    for(int x=0; x<10; x++){
+        for(int y=0; y<10; y++){
+            if(tablero2[i][j] == 2){
+                if(tablero2[x][y] < 0){
+                    int enLinea = enDiagonal(i, j, x, y);
+                    if(enLinea != 0){
+                        int direccion;
+                        if(x-i < 0 && y-j < 0)
+                            direccion = 0;
+                        if(x-i < 0 && y-j > 0)
+                            direccion = 1;
+                        if(x-i > 0 && y-j < 0)
+                            direccion = 2;
+                        if(x-i > 0 && y-j > 0)
+                            direccion = 3;
+                        int saltos;
+                        int X = i;
+                        int Y = j;
+                        Tablero *temporal;
+                        temporal = &*this;
+                        
+                        for(saltos=0; saltos < enLinea; saltos++){
+                            if(temporal->abierto(X-1, Y-1) && direccion == 0){
+                                temporal = new Tablero(*temporal, X, Y, 0);
+                                X = X-1;
+                                Y = Y-1;
+                            }else{
+                                if(temporal->salto(X, Y, X-1, Y-1) && direccion == 0){
+                                    temporal = new Tablero(*temporal, X, Y, 4);
+                                    list<Tablero> derivados;
+                                    derivados.operator =(temporal->getEatReina(X-2, Y-2));
+                                    moves.push_back(*temporal);
+                                    list<Tablero>::iterator ini = derivados.begin();
+                                    list<Tablero>::iterator fin = derivados.end();
+                                    while(ini != fin){
+                                        moves.push_back(*ini);
+                                        ini++;
+                                    }
+                                    
+                                    X = X-2;
+                                    Y = Y-2;
+                                    
+                                }else{
+                                    if(temporal->abierto(X-1, Y+1) && direccion == 1){
+                                        temporal = new Tablero(*temporal, X, Y, 1);
+                                        X = X-1;
+                                        Y = Y+1;
+                                    }else{
+                                        if(temporal->salto(X, Y, X-1, Y+1) && direccion == 1){
+                                            temporal = new Tablero(*temporal, X, Y, 5);
+                                            list<Tablero> derivados;
+                                            derivados.operator =(temporal->getEatReina(X-2, Y+2));
+                                            moves.push_back(*temporal);
+                                            list<Tablero>::iterator ini = derivados.begin();
+                                            list<Tablero>::iterator fin = derivados.end();
+                                            while(ini != fin){
+                                                moves.push_back(*ini);
+                                                ini++;
+                                            }
+                                    
+                                            X = X-2;
+                                            Y = Y+2;
+                                        }else{
+                                            if(temporal->abierto(X+1, Y-1) && direccion == 2){
+                                                temporal = new Tablero(*temporal, X, Y, 2);
+                                                X = X+1;
+                                                Y = Y-1;
+                                            }else{
+                                                if(temporal->salto(X, Y, X+1, Y-1) && direccion == 2){
+                                                    temporal = new Tablero(*temporal, X, Y, 6);
+                                                    list<Tablero> derivados;
+                                                    derivados.operator =(temporal->getEatReina(X+2, Y-2));
+                                                    moves.push_back(*temporal);
+                                                    list<Tablero>::iterator ini = derivados.begin();
+                                                    list<Tablero>::iterator fin = derivados.end();
+                                                    while(ini != fin){
+                                                        moves.push_back(*ini);
+                                                        ini++;
+                                                    }
+                                    
+                                                    X = X+2;
+                                                    Y = Y-2;
+                                                }else{
+                                                    if(temporal->abierto(X+1, Y+1) && direccion == 3){
+                                                        temporal = new Tablero(*temporal, X, Y,3);
+                                                        X = X+1;
+                                                        Y = Y+1;
+                                                    }else{
+                                                        if(temporal->salto(X, Y, X+1, Y+1) && direccion == 3){
+                                                            temporal = new Tablero(*temporal, X, Y, 7);
+                                                            list<Tablero> derivados;
+                                                            derivados.operator =(temporal->getEatReina(X+2, Y+2));
+                                                            moves.push_back(*temporal);
+                                                            list<Tablero>::iterator ini = derivados.begin();
+                                                            list<Tablero>::iterator fin = derivados.end();
+                                                            while(ini != fin){
+                                                                moves.push_back(*ini);
+                                                                ini++;
+                                                            }
+                                    
+                                                            X = X+2;
+                                                            Y = Y+2;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        delete(temporal);
+                    }
                 }
-            }  
-        }
-        if(abierto(iX-1, iY+1) && direccion == 1){
-            Tablero nuevoTablero = Tablero(*this,iX,iY,1);
-            list<Tablero> der;
-            der.operator=(nuevoTablero.getMovReina(iX-1, iY+1, fX, fY, direccion));    
-            if(der.empty())
-                moves.push_back(nuevoTablero);
-            else{
-                list<Tablero>::iterator ini = der.begin();
-                list<Tablero>::iterator fin = der.end();
-                while(ini != fin){
-                    moves.push_back(*ini);
-                    ini++;
-                }
-            } 
-        }
-        if(abierto(iX+1, iY-1) && direccion == 2){
-            Tablero nuevoTablero = Tablero(*this,iX,iY,2);
-            list<Tablero> der;
-            der.operator=(nuevoTablero.getMovReina(iX+1, iY-1, fX, fY, direccion));   
-            if(der.empty())
-                moves.push_back(nuevoTablero);
-            else{
-                list<Tablero>::iterator ini = der.begin();
-                list<Tablero>::iterator fin = der.end();
-                while(ini != fin){
-                    moves.push_back(*ini);
-                    ini++;
-                }
-            } 
-        }
-        if(abierto(iX+1, iY+1) && direccion == 3){
-            Tablero nuevoTablero = Tablero(*this,iX,iY,3);
-            list<Tablero> der;
-            der.operator=(nuevoTablero.getMovReina(iX+1, iY+1, fX, fY, direccion));   
-            if(der.empty())
-                moves.push_back(nuevoTablero);
-            else{
-                list<Tablero>::iterator ini = der.begin();
-                list<Tablero>::iterator fin = der.end();
-                while(ini != fin){
-                    moves.push_back(*ini);
-                    ini++;
-                }
-            } 
+            }
         }
     }
     return moves;
