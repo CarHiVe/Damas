@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <locale>
 #include <ctype.h>
+#include <unistd.h>
 using namespace std;
 
 /*
@@ -21,37 +22,34 @@ int main(int argc, char** argv) {
     setlocale(LC_CTYPE, "");
     //Juego j;
     Tablero *t = new Tablero();
-    JugadorHumano *jugador = new JugadorHumano(true);
+    JugadorHumano *jugador = new JugadorHumano(false);
     list<Tablero> auxiliar;
     system("clear");
     while(!t->juegoTerminado(true) && !t->juegoTerminado(false)){
         t->mostrar();
-        t->operator =(jugador->movimiento(*t));
-        cin.ignore().get();
+       
         system("clear");
-        system("clear");
-        //auxiliar.operator =(t->getMovimiento(true));
+        auxiliar.operator =(t->getMovimiento(true));
         list<Tablero>::iterator ini = auxiliar.begin();
         list<Tablero>::iterator fin = auxiliar.end();
     
         double max =0 , min = 999;
-        /*while(ini != fin){
+       while(ini != fin){
             double tmpx =  ini->valorTablero();
             if( tmpx >= max){
                 t->operator=( *ini);
                 max = ini->valorTablero();
             }
             ini++;
-        }*/
+        }
          t->mostrar();
-        cin.ignore().get();
+         t->operator =(jugador->movimiento(*t));
         system("clear");
-        system("clear");
-        auxiliar.operator =(t->getMovimiento(false));
+        //auxiliar.operator =(t->getMovimiento(false));
         ini = auxiliar.begin();
         fin = auxiliar.end();
         
-        while(ini != fin){
+        /*while(ini != fin){
             double tmpx =  ini->valorTablero();
             
             if( tmpx <= min){
@@ -59,7 +57,7 @@ int main(int argc, char** argv) {
                 min = ini->valorTablero();
             }
             ini++;
-        }
+        }*/
        
     }
     t->mostrar();

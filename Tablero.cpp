@@ -3,12 +3,6 @@
 
 Tablero::Tablero() {
     setlocale(LC_CTYPE,"");
-    comer = 0;
-    /*ValPieza = 0;
-    X1 = 0;
-    Y1 = 0;
-    X2 = 0;
-    Y2 = 0;*/
     for(int i=0;i<10;i++){
         for(int j=0;j<10;j++){
             if(i<3 && (i+j)%2 != 0){
@@ -717,18 +711,27 @@ int Tablero::enDiagonal(int i, int j, int x, int y){
                 }
             }
         }
-        
-        
     }else{
         if(tablero2[x][y] > 0){
-            if(tablero2[x-1][y-1] > 0 )
-                return 0;
-            if(tablero2[x-1][y+1] > 0)
-                return 0;
-            if(tablero2[x+1][y-1] > 0)
-                return 0;
-            if(tablero2[x+1][y+1] > 0)
-                return 0;
+            if(direccion == 0){
+                if(tablero2[x-1][y-1] > 0 || dentro(x-1, y-1) == false)
+                    return 0;
+            }else{
+                if(direccion == 1){
+                    if(tablero2[x-1][y+1] > 0 || dentro(x-1, y+1) == false)
+                        return 0;
+                }else{
+                    if(direccion == 2){
+                        if(tablero2[x+1][y-1] > 0 || dentro(x+1, y-1) == false)
+                        return 0;
+                    }else{
+                        if(direccion == 3){
+                            if(tablero2[x+1][y+1] > 0 || dentro(x+1, y+1) == false)
+                                return 0;
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -856,6 +859,128 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                     
                                                             X = X+2;
                                                             Y = Y+2;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }else{
+            
+                if(tablero2[i][j] == -2){
+                    if(tablero2[x][y] > 0){
+                        int enLinea = enDiagonal(i, j, x, y);
+                        if(enLinea != 0){
+                            int direccion;
+                            if(x-i < 0 && y-j < 0)
+                                direccion = 0;
+                            if(x-i < 0 && y-j > 0)
+                                direccion = 1;
+                            if(x-i > 0 && y-j < 0)
+                                direccion = 2;
+                            if(x-i > 0 && y-j > 0)
+                                direccion = 3;
+                            int saltos;
+                            int X = i;
+                            int Y = j;
+                            Tablero *temporal;
+                            temporal = &*this;
+
+                            for(saltos=0; saltos < enLinea; saltos++){
+                                if(temporal->abierto(X-1, Y-1) && direccion == 0){
+                                    temporal = new Tablero(*temporal, X, Y, 0);
+                                    temporal->comer = 2;
+                                    moves.push_back(*temporal);
+                                    X = X-1;
+                                    Y = Y-1;
+                                }else{
+                                    if(temporal->salto(X, Y, X-1, Y-1) && direccion == 0){
+                                        temporal = new Tablero(*temporal, X, Y, 4);
+                                        list<Tablero> derivados;
+                                        derivados.operator =(temporal->getEatReina(X-2, Y-2));
+                                        moves.push_back(*temporal);
+                                        list<Tablero>::iterator ini = derivados.begin();
+                                        list<Tablero>::iterator fin = derivados.end();
+                                        while(ini != fin){
+                                            moves.push_back(*ini);
+                                            ini++;
+                                        }
+
+                                        X = X-2;
+                                        Y = Y-2;
+
+                                    }else{
+                                        if(temporal->abierto(X-1, Y+1) && direccion == 1){
+                                            temporal = new Tablero(*temporal, X, Y, 1);
+                                            temporal->comer = 2;
+                                            moves.push_back(*temporal);
+                                            X = X-1;
+                                            Y = Y+1;
+                                        }else{
+                                            if(temporal->salto(X, Y, X-1, Y+1) && direccion == 1){
+                                                temporal = new Tablero(*temporal, X, Y, 5);
+                                                list<Tablero> derivados;
+                                                derivados.operator =(temporal->getEatReina(X-2, Y+2));
+                                                moves.push_back(*temporal);
+                                                list<Tablero>::iterator ini = derivados.begin();
+                                                list<Tablero>::iterator fin = derivados.end();
+                                                while(ini != fin){
+                                                    moves.push_back(*ini);
+                                                    ini++;
+                                                }
+
+                                                X = X-2;
+                                                Y = Y+2;
+                                            }else{
+                                                if(temporal->abierto(X+1, Y-1) && direccion == 2){
+                                                    temporal = new Tablero(*temporal, X, Y, 2);
+                                                    temporal->comer = 2;
+                                                    moves.push_back(*temporal);
+                                                    X = X+1;
+                                                    Y = Y-1;
+                                                }else{
+                                                    if(temporal->salto(X, Y, X+1, Y-1) && direccion == 2){
+                                                        temporal = new Tablero(*temporal, X, Y, 6);
+                                                        list<Tablero> derivados;
+                                                        derivados.operator =(temporal->getEatReina(X+2, Y-2));
+                                                        moves.push_back(*temporal);
+                                                        list<Tablero>::iterator ini = derivados.begin();
+                                                        list<Tablero>::iterator fin = derivados.end();
+                                                        while(ini != fin){
+                                                            moves.push_back(*ini);
+                                                            ini++;
+                                                        }
+
+                                                        X = X+2;
+                                                        Y = Y-2;
+                                                    }else{
+                                                        if(temporal->abierto(X+1, Y+1) && direccion == 3){
+                                                            temporal = new Tablero(*temporal, X, Y,3);
+                                                            temporal->comer = 2;
+                                                            moves.push_back(*temporal);
+                                                            X = X+1;
+                                                            Y = Y+1;
+                                                        }else{
+                                                            if(temporal->salto(X, Y, X+1, Y+1) && direccion == 3){
+                                                                temporal = new Tablero(*temporal, X, Y, 7);
+                                                                list<Tablero> derivados;
+                                                                derivados.operator =(temporal->getEatReina(X+2, Y+2));
+                                                                moves.push_back(*temporal);
+                                                                list<Tablero>::iterator ini = derivados.begin();
+                                                                list<Tablero>::iterator fin = derivados.end();
+                                                                while(ini != fin){
+                                                                    moves.push_back(*ini);
+                                                                    ini++;
+                                                                }
+
+                                                                X = X+2;
+                                                                Y = Y+2;
+                                                            }
                                                         }
                                                     }
                                                 }
