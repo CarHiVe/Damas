@@ -31,6 +31,7 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
                 desdeX = ini->X1;
                 desdeY = ini->Y1;
                 comer.push_back(*ini);
+                break;
             }
             ini++;
         }
@@ -39,7 +40,7 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
         move[2] = 'n';
         move[3] = 'n';
         if(!comer.empty()){
-            
+            wcout << "Desde X = " << desdeX << ", Desde Y = " << desdeY << endl;
             wcout << "Ingrese coordenadas (desde[x1][y1], hacia[x2][y2]): ";
             wcin >> setw(1) >> move[0];
             wcin >> setw(1) >> move[1];
@@ -105,6 +106,7 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
                                     desdeX = X2;
                                     desdeY = Y2;
                                 }
+                                
                                 if(direccion == 0){
                                     aux = Tablero(aux, X1, Y1, 0);
                                     aux = Tablero(aux, desdeX, desdeY, 8);
@@ -277,8 +279,7 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
                         }
                     }
                 }
-            }
-                
+            } 
         }else{
             wcout << "Ingrese coordenadas (desde[x1][y1], hacia[x2][y2]): ";
             wcin >> setw(1) >> move[0];

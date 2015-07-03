@@ -403,15 +403,12 @@ list<Tablero> Tablero::getSalto(int i, int j, int pieza, int direccion){
             Tablero nuevoTablero = Tablero(*this, i, j, 4);
             list <Tablero> saltosDerivados;
             saltosDerivados.operator=(nuevoTablero.getSalto(i-2, j-2, pieza, 0));
-            if(saltosDerivados.empty())
-                moves.push_back(nuevoTablero);
-            else{
-                list<Tablero>::iterator ini = saltosDerivados.begin();
-                list<Tablero>::iterator fin = saltosDerivados.end();
-                while(ini != fin){
-                    moves.push_back(*ini);
-                    ini++;
-                }
+            moves.push_back(nuevoTablero);
+            list<Tablero>::iterator ini = saltosDerivados.begin();
+            list<Tablero>::iterator fin = saltosDerivados.end();
+            while(ini != fin){
+                moves.push_back(*ini);
+                ini++;
             }
         }
         
@@ -419,16 +416,13 @@ list<Tablero> Tablero::getSalto(int i, int j, int pieza, int direccion){
             Tablero nuevoTablero = Tablero(*this, i, j, 5);
             list <Tablero> saltosDerivados;
             saltosDerivados.operator=(nuevoTablero.getSalto(i-2, j+2, pieza, 1));
-            if(saltosDerivados.empty())
                 moves.push_back(nuevoTablero);
-            else{
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
                 while(ini != fin){
                     moves.push_back(*ini);
                     ini++;
                 }
-            }
         }
     }
     
@@ -437,32 +431,26 @@ list<Tablero> Tablero::getSalto(int i, int j, int pieza, int direccion){
             Tablero nuevoTablero = Tablero(*this, i, j, 6);
             list <Tablero> saltosDerivados;
             saltosDerivados.operator=(nuevoTablero.getSalto(i+2, j-2, pieza, 2));
-            if(saltosDerivados.empty())
                 moves.push_back(nuevoTablero);
-            else{
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
                 while(ini != fin){
                     moves.push_back(*ini);
                     ini++;
                 }
-            }
         }
         
         if(salto(i, j, i+1, j+1)){
             Tablero nuevoTablero = Tablero(*this, i, j, 7);
             list <Tablero> saltosDerivados;
             saltosDerivados.operator=(nuevoTablero.getSalto(i+2, j+2, pieza, 3));
-            if(saltosDerivados.empty())
                 moves.push_back(nuevoTablero);
-            else{
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
                 while(ini != fin){
                     moves.push_back(*ini);
                     ini++;
                 }
-            }
         }
     }
    
@@ -698,6 +686,51 @@ bool Tablero::equals(const Tablero& t){
 int Tablero::enDiagonal(int i, int j, int x, int y){
     int distanciaX = x-i;
     int distanciaY = y-j;
+    int direccion;
+    
+    if(distanciaX < 0 && distanciaY < 0)
+        direccion = 0;
+    if(distanciaX < 0 && distanciaY > 0)
+        direccion = 1;
+    if(distanciaX > 0 && distanciaY < 0)
+        direccion = 2;
+    if(distanciaX > 0 && distanciaY > 0)
+        direccion = 3;
+    
+    if(tablero2[x][y] < 0){
+        if(direccion == 0){
+            if(tablero2[x-1][y-1] < 0 || dentro(x-1, y-1) == false)
+                return 0;
+        }else{
+            if(direccion == 1){
+                if(tablero2[x-1][y+1] < 0 || dentro(x-1, y+1) == false)
+                    return 0;
+            }else{
+                if(direccion == 2){
+                    if(tablero2[x+1][y-1] < 0 || dentro(x+1, y-1) == false)
+                    return 0;
+                }else{
+                    if(direccion == 3){
+                        if(tablero2[x+1][y+1] < 0 || dentro(x+1, y+1) == false)
+                            return 0;
+                    }
+                }
+            }
+        }
+        
+        
+    }else{
+        if(tablero2[x][y] > 0){
+            if(tablero2[x-1][y-1] > 0 )
+                return 0;
+            if(tablero2[x-1][y+1] > 0)
+                return 0;
+            if(tablero2[x+1][y-1] > 0)
+                return 0;
+            if(tablero2[x+1][y+1] > 0)
+                return 0;
+        }
+    }
     
     if(distanciaX < 0)
         distanciaX*=-1;
@@ -737,6 +770,8 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                         for(saltos=0; saltos < enLinea; saltos++){
                             if(temporal->abierto(X-1, Y-1) && direccion == 0){
                                 temporal = new Tablero(*temporal, X, Y, 0);
+                                temporal->comer = 2;
+                                moves.push_back(*temporal);
                                 X = X-1;
                                 Y = Y-1;
                             }else{
@@ -758,6 +793,8 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                 }else{
                                     if(temporal->abierto(X-1, Y+1) && direccion == 1){
                                         temporal = new Tablero(*temporal, X, Y, 1);
+                                        temporal->comer = 2;
+                                        moves.push_back(*temporal);
                                         X = X-1;
                                         Y = Y+1;
                                     }else{
@@ -778,6 +815,8 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                         }else{
                                             if(temporal->abierto(X+1, Y-1) && direccion == 2){
                                                 temporal = new Tablero(*temporal, X, Y, 2);
+                                                temporal->comer = 2;
+                                                moves.push_back(*temporal);
                                                 X = X+1;
                                                 Y = Y-1;
                                             }else{
@@ -798,6 +837,8 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                                 }else{
                                                     if(temporal->abierto(X+1, Y+1) && direccion == 3){
                                                         temporal = new Tablero(*temporal, X, Y,3);
+                                                        temporal->comer = 2;
+                                                        moves.push_back(*temporal);
                                                         X = X+1;
                                                         Y = Y+1;
                                                     }else{
@@ -824,7 +865,6 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                 }
                             }
                         }
-                        delete(temporal);
                     }
                 }
             }
