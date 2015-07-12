@@ -23,6 +23,10 @@ public:
     Tablero movimiento(const Tablero& t);
     
     bool jugador;
+    int X1;
+    int Y1;
+    int X2;
+    int Y2;
 };
 
 #endif	/* JUGADORHUMANO_H */

@@ -9,14 +9,15 @@
 #define	JUEGO_H
 #include "Jugador.h"
 #include "Tablero.h"
+#include "JugadorHumano.h"
 
 using namespace std;
 
 class Juego {
 public:
     Tablero *tab;
-    Jugador *blanco;
-    Jugador *negro;
+    Jugador negra;
+    JugadorHumano blanca;
     bool player;
     
     Juego();

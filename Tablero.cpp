@@ -525,8 +525,6 @@ list<Tablero> Tablero::getSaltoDerivado(int i, int j, int direccion){
 list<Tablero> Tablero::getMovimientoDerivado(int i, int j, int direccion){
     list<Tablero> moves;
     
-    moves.operator =(this->getSaltoDerivado(i,j,direccion));
-    
     if(moves.empty()){
     if(abierto(i-1, j-1) && (direccion == 0 || direccion == 4)){
         Tablero nuevoTablero = Tablero(*this,i,j,0);
@@ -996,4 +994,24 @@ list<Tablero> Tablero::getEatReina(int i, int j){
         }
     }
     return moves;
+}
+
+int Tablero::cantPiezas(bool jugador){
+    int cont = 0;
+    if(jugador == true){
+        for(int i=0; i<8; i++){
+            for(int j=0; j<8; j++){
+                if(tablero[i][j] == 1)
+                    cont++;
+            }
+        }
+    }else{
+        for(int i=0; i<8; i++){
+            for(int j=0; j<8; j++){
+                if(tablero[i][j] == -1)
+                    cont++;
+            }
+        }
+    }
+    return cont;
 }

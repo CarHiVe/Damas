@@ -35,6 +35,7 @@ public:
     bool equals(const Tablero& t);
     int enDiagonal(int i, int j, int x, int y);
     list<Tablero> getEatReina(int i, int j);
+    int cantPiezas(bool jugador);
     
     wchar_t tablero[10][10];
     int tablero2[10][10];

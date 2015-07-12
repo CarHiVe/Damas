@@ -9,20 +9,19 @@
 #define	JUGADOR_H
 #include "Arbol.h"
 #include "Tablero.h"
-
+#include <vector>
 using namespace std;
 
 class Jugador {
 public:
+    Jugador(const Tablero& t, bool player, int prof);
+    void mostrar();
+    Tablero& movimiento(bool player);
+    void Actualizar(const Tablero& t, int prof);
+     
     Arbol miArbol;
     bool jugador;
-    int profundidad;
-    
-    Jugador(const Tablero& t, int prof, bool player);
-    Tablero& movimiento();
-    void actualizar(const Tablero& t, bool jugador);
-    Arbol& get(int i);
-    void mostrarHijos();
+    list<Tablero> generados;
 };
 
 #endif	/* JUGADOR_H */

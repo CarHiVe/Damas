@@ -7,25 +7,19 @@
 
 #ifndef ARBOL_H
 #define	ARBOL_H
-#include "Tablero.h"
 #include <list>
-#include <iostream>
-
-using namespace std;
+#include "Tablero.h"
 
 class Arbol {
 public:
-    list <Arbol> hijos;
-    bool player;
-    Tablero tab;
-    
     Arbol();
-    Arbol(const Tablero& t, bool jugador);
-    void Brote(bool jugador);
-    double minimax(bool jugador);
-    Arbol& movimiento(bool jugador);
-    Arbol& operator =(const Arbol& ab);
+    Arbol(const Tablero& t, bool player);
+    void Brote(bool player);
+    double minimax(bool player);
     
+    bool jugador;
+    list<Arbol> hijos;
+    Tablero *tab;
 };
 
 #endif	/* ARBOL_H */

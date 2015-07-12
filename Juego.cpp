@@ -11,21 +11,18 @@
 using namespace std;
 
 
-Juego::Juego() {
-    tab = new Tablero();
+/*Juego::Juego() {
     player = true;
-    blanco = new Jugador(*tab, 4, player);
-    //blanco->mostrarHijos();
-    negro = new Jugador(*tab, 4, !player);
-    //negro->mostrarHijos();
-    tab->mostrar();
+    tab = new Tablero();
+    blanca = JugadorHumano(player);
+    negra = Jugador(*tab, 4, !player);
+     
     while(!tab->juegoTerminado(player)){
-        cin.ignore().get();
-        system("clear");
-        tab->operator =((player ? blanco->movimiento() : negro->movimiento()));
         tab->mostrar();
-        blanco->actualizar(*tab,player);
-        negro->actualizar(*tab,player);
+        
+        tab->operator =(player? blanca->movimiento(*tab) : negra->movimiento(false));
+        system("clear");
+        negra->Actualizar(*tab, 4);
         player = !player;
         
     }
@@ -35,4 +32,4 @@ Juego::Juego() {
         wcout << "\nGano CPU Blanca" << endl;
     }
     
-}
+}*/

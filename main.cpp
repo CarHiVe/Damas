@@ -6,12 +6,12 @@
  */
 #include "Tablero.h"
 
-//#include "Juego.h"
+#include "Juego.h"
 #include "JugadorHumano.h"
 #include <iostream>
 #include <cstdlib>
 #include <locale>
-#include <ctype.h>
+
 #include <unistd.h>
 using namespace std;
 
@@ -19,52 +19,27 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-    setlocale(LC_CTYPE, "");
-    //Juego j;
-    Tablero *t = new Tablero();
-    JugadorHumano *jugador = new JugadorHumano(false);
-    list<Tablero> auxiliar;
     system("clear");
-    while(!t->juegoTerminado(true) && !t->juegoTerminado(false)){
-        t->mostrar();
-       
-        system("clear");
-        auxiliar.operator =(t->getMovimiento(true));
-        list<Tablero>::iterator ini = auxiliar.begin();
-        list<Tablero>::iterator fin = auxiliar.end();
-    
-        double max =0 , min = 999;
-       while(ini != fin){
-            double tmpx =  ini->valorTablero();
-            if( tmpx >= max){
-                t->operator=( *ini);
-                max = ini->valorTablero();
-            }
-            ini++;
-        }
-         t->mostrar();
-         t->operator =(jugador->movimiento(*t));
-        system("clear");
-        //auxiliar.operator =(t->getMovimiento(false));
-        ini = auxiliar.begin();
-        fin = auxiliar.end();
+    setlocale(LC_CTYPE, "");
+    bool player = true;
+    Tablero *tab = new Tablero();
+    JugadorHumano blanca = JugadorHumano(player);
+    Jugador negra = Jugador(*tab, !player, 4);
+     
+    while(!tab->juegoTerminado(player)){
+        tab->mostrar();
         
-        /*while(ini != fin){
-            double tmpx =  ini->valorTablero();
-            
-            if( tmpx <= min){
-                t->operator=( *ini);
-                min = ini->valorTablero();
-            }
-            ini++;
-        }*/
-       
+        tab->operator =(player? blanca.movimiento(*tab) : negra.movimiento(false));
+        system("clear");
+        negra.Actualizar(*tab, 4);
+        player = !player;
+        
     }
-    t->mostrar();
-    if(t->juegoTerminado(true))
-        wcout << "Gano negro" << endl;
-    else
-        wcout << "Gano blanco" << endl;
+    if(player == true){
+        wcout << "\nGano CPU Negra" << endl;
+    }else{
+        wcout << "\nGano CPU Blanca" << endl;
+    }
     return 0;
 }
 
