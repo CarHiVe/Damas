@@ -16,6 +16,7 @@ public:
     Arbol(const Tablero& t, bool player);
     void Brote(bool player);
     double minimax(bool player);
+    list<Tablero> movimiento(bool player);
     
     bool jugador;
     list<Arbol> hijos;

@@ -40,6 +40,8 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
             move[2] = 'n';
             move[3] = 'n';
             int invalido = 0;
+            /*Si la lista comer no está vacía, entonces comienza esta sección
+            que sirve para comer*/
             if(!comer.empty()){
                 wcout << "Ingrese coordenadas (desde[x1][y1], hacia[x2][y2]): ";
                 wcin >> setw(1) >> move[0];
@@ -73,7 +75,7 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
                                 list<Tablero>::iterator ini = auxiliar.begin();
                                 list<Tablero>::iterator fin = auxiliar.end();
                                 while(ini != fin){
-                                    if(ini->comer > 0 && X2 == ini->X1 && Y2 == ini->Y1)
+                                    if(ini->comer > 0 && X2 == ini->X1 && Y2 == ini->Y1 && /*ini->tablero2[X2][Y2] != 2*/ X2 != 0)
                                         comer.push_back(*ini);
                                     ini++;
                                 }
@@ -84,14 +86,14 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
                                     aux.mostrar();
                                 }
                             }else{
-                                if(aux.salto(X1, Y1, X1-1, Y1+1) && X1-2 == X2 && Y1+2 == Y2){
+                                if(aux.salto(X1, Y1, X1-1, Y1+1) && X1-2 == X2 && Y1+2 == Y2 ){
                                     aux = Tablero(aux, X1, Y1, 5);
                                     list<Tablero> comer;
                                     auxiliar.operator =(aux.getMovimiento(jugador));
                                     list<Tablero>::iterator ini = auxiliar.begin();
                                     list<Tablero>::iterator fin = auxiliar.end();
                                     while(ini != fin){
-                                        if(ini->comer > 0 && X2 == ini->X1 && Y2 == ini->Y1)
+                                        if(ini->comer > 0 && X2 == ini->X1 && Y2 == ini->Y1 && X2 != 0 /*ini->tablero2[X2][Y2] != 2*/)
                                             comer.push_back(*ini);
                                         ini++;
                                     }

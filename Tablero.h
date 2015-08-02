@@ -36,6 +36,8 @@ public:
     int enDiagonal(int i, int j, int x, int y);
     list<Tablero> getEatReina(int i, int j);
     int cantPiezas(bool jugador);
+    bool verificarReina(bool player);
+    int heuristic(bool player1, bool player2);
     
     wchar_t tablero[10][10];
     int tablero2[10][10];

@@ -9,6 +9,7 @@
 #define	JUGADOR_H
 #include "Arbol.h"
 #include "Tablero.h"
+#include <unistd.h>
 #include <vector>
 using namespace std;
 

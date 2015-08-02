@@ -219,6 +219,7 @@ void Tablero::mostrar(){
                 cout << endl << endl;
         }
     }
+    //wcout << "Movimiento desde " << X1 << " " << Y1 << " hasta " << X2 << " " << Y2 << endl;
 }
 
 list<Tablero> Tablero::getMovimiento(bool player){
@@ -397,12 +398,15 @@ list<Tablero> Tablero::getSalto(int i, int j, int pieza, int direccion){
             Tablero nuevoTablero = Tablero(*this, i, j, 4);
             list <Tablero> saltosDerivados;
             saltosDerivados.operator=(nuevoTablero.getSalto(i-2, j-2, pieza, 0));
-            moves.push_back(nuevoTablero);
-            list<Tablero>::iterator ini = saltosDerivados.begin();
-            list<Tablero>::iterator fin = saltosDerivados.end();
-            while(ini != fin){
-                moves.push_back(*ini);
-                ini++;
+            if(moves.empty())
+                moves.push_back(nuevoTablero);
+            else{
+                list<Tablero>::iterator ini = saltosDerivados.begin();
+                list<Tablero>::iterator fin = saltosDerivados.end();
+                while(ini != fin){
+                    moves.push_back(*ini);
+                    ini++;
+                }
             }
         }
         
@@ -410,13 +414,16 @@ list<Tablero> Tablero::getSalto(int i, int j, int pieza, int direccion){
             Tablero nuevoTablero = Tablero(*this, i, j, 5);
             list <Tablero> saltosDerivados;
             saltosDerivados.operator=(nuevoTablero.getSalto(i-2, j+2, pieza, 1));
+            if(moves.empty())
                 moves.push_back(nuevoTablero);
+            else{
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
                 while(ini != fin){
                     moves.push_back(*ini);
                     ini++;
                 }
+            }
         }
     }
     
@@ -425,26 +432,32 @@ list<Tablero> Tablero::getSalto(int i, int j, int pieza, int direccion){
             Tablero nuevoTablero = Tablero(*this, i, j, 6);
             list <Tablero> saltosDerivados;
             saltosDerivados.operator=(nuevoTablero.getSalto(i+2, j-2, pieza, 2));
+            if(moves.empty())
                 moves.push_back(nuevoTablero);
+            else{    
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
                 while(ini != fin){
                     moves.push_back(*ini);
                     ini++;
                 }
+            }
         }
         
         if(salto(i, j, i+1, j+1)){
             Tablero nuevoTablero = Tablero(*this, i, j, 7);
             list <Tablero> saltosDerivados;
             saltosDerivados.operator=(nuevoTablero.getSalto(i+2, j+2, pieza, 3));
+            if(moves.empty())
                 moves.push_back(nuevoTablero);
+            else{
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
                 while(ini != fin){
                     moves.push_back(*ini);
                     ini++;
                 }
+            }
         }
     }
    
@@ -999,19 +1012,40 @@ list<Tablero> Tablero::getEatReina(int i, int j){
 int Tablero::cantPiezas(bool jugador){
     int cont = 0;
     if(jugador == true){
-        for(int i=0; i<8; i++){
-            for(int j=0; j<8; j++){
-                if(tablero[i][j] == 1)
-                    cont++;
+        for(int i=0; i<10; i++){
+            for(int j=0; j<10; j++){
+                if(tablero2[i][j] > 0){
+                    cont+=tablero2[i][j];
+                    if(tablero2[i][j] == 2)
+                        cont+=10;
+                }
             }
         }
     }else{
-        for(int i=0; i<8; i++){
-            for(int j=0; j<8; j++){
-                if(tablero[i][j] == -1)
-                    cont++;
+        for(int i=0; i<10; i++){
+            for(int j=0; j<10; j++){
+                if(tablero2[i][j] < 0){
+                    cont+=(tablero2[i][j]*-1);
+                    if(tablero2[i][j] == -2)
+                        cont+=10;
+                }
             }
         }
     }
     return cont;
+}
+
+bool Tablero::verificarReina(bool player){
+    for(int i=0; i<10; i++){
+        for(int j=0; j<10; j++){
+            if((player && tablero2[i][j] == 2) || (!player && tablero2[i][j] == -2))
+                return true;
+        }
+    }
+    
+    return false;
+}
+
+int Tablero::heuristic(bool player1, bool player2){
+    return cantPiezas(player1)-cantPiezas(player2);
 }
