@@ -8,6 +8,7 @@
 #ifndef ARBOL_H
 #define	ARBOL_H
 #include <list>
+#include <vector>
 #include "Tablero.h"
 
 class Arbol {
@@ -15,8 +16,6 @@ public:
     Arbol();
     Arbol(const Tablero& t, bool player);
     void Brote(bool player);
-    double minimax(bool player);
-    list<Tablero> movimiento(bool player);
     
     bool jugador;
     list<Arbol> hijos;

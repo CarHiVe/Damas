@@ -1,6 +1,6 @@
 /* 
  * File:   Arbol.cpp
- * Author: nelson
+ * Author: Nelson Cariqueo, Camila Vera, Diego Higuera
  * 
  * Created on 3 de junio de 2015, 21:12
  */
@@ -39,60 +39,4 @@ void Arbol::Brote(bool player){
             ini++;
         }
     }
-}
-
-double Arbol::minimax(bool player){
-    if(hijos.empty())
-        return tab->heuristic(player, !player);
-    
-    if(player){
-        double a = 0;
-        list<Arbol>::iterator ini = hijos.begin();
-        list<Arbol>::iterator fin = hijos.end();
-        while(ini != fin){
-            a = (a > ini->minimax(!player)? a : ini->minimax(!player));
-            ini++;
-        }
-        return a;
-    }
-    else{
-        double a = 999999;
-        list<Arbol>::iterator ini = hijos.begin();
-        list<Arbol>::iterator fin = hijos.end();
-        while(ini != fin){
-            a = (a < ini->minimax(!player)? a : ini->minimax(!player));
-            ini++;
-        }
-        return a;
-    }
-}
-
-list<Tablero> Arbol::movimiento(bool player){
-    list<Tablero> movimientos;
-    if(player){
-        double a = 0;
-        list<Arbol>::iterator ini = hijos.begin();
-        list<Arbol>::iterator fin = hijos.end();
-        while(ini != fin){
-            double valor = ini->minimax(!player);
-            if(a == 0 || valor > a){
-                a = valor;
-                movimientos.push_back(*ini->tab);
-            }
-            ini++;
-        }
-    }else{
-        double a = 9999;
-        list<Arbol>::iterator ini = hijos.begin();
-        list<Arbol>::iterator fin = hijos.end();
-        while(ini != fin){
-            double valor = ini->minimax(!player);
-            if(a == 9999 || valor < a){
-                a = valor;
-                movimientos.push_back(*ini->tab);
-            }
-            ini++;
-        }
-    }
-    return movimientos;
 }

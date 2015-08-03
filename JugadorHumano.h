@@ -1,6 +1,6 @@
 /* 
  * File:   JugadorHumano.h
- * Author: nelson
+ * Author: Nelson Cariqueo, Camila Vera, Diego Higuera
  *
  * Created on 18 de junio de 2015, 9:40
  */
@@ -20,7 +20,7 @@ using namespace std;
 class JugadorHumano {
 public:
     JugadorHumano(bool player);
-    Tablero movimiento(const Tablero& t);
+    Tablero movimientoBlanca(const Tablero& t);
     
     bool jugador;
     int X1;

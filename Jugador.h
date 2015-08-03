@@ -1,6 +1,6 @@
 /* 
  * File:   Jugador.h
- * Author: nelson
+ * Author: Nelson Cariqueo, Camila Vera, Diego Higuera
  *
  * Created on 3 de junio de 2015, 21:54
  */
@@ -16,7 +16,6 @@ using namespace std;
 class Jugador {
 public:
     Jugador(const Tablero& t, bool player, int prof);
-    void mostrar();
     Tablero& movimiento(bool player);
     void Actualizar(const Tablero& t, int prof);
      

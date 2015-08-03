@@ -1,6 +1,6 @@
 /* 
  * File:   Tablero.h
- * Author: nelson
+ * Author: Nelson Cariqueo, Camila Vera, Diego Higuera
  *
  * Created on 31 de mayo de 2015, 21:44
  */
@@ -23,10 +23,9 @@ public:
     void mostrar();
     list<Tablero> getMovimiento(bool player);
     list<Tablero> getSalto(int i, int j, int pieza, int direccion);
-    list<Tablero> getSaltoDerivado(int i, int j, int direccion);
     list<Tablero> getMovimientoDerivado(int i, int j, int direccion);
     Tablero& operator =(const Tablero& t);
-    double valorTablero();
+    
     bool salto(int i1, int j1, int i2, int j2);
     bool abierto(int i, int j);
     bool dentro(int i, int j);
@@ -36,7 +35,6 @@ public:
     int enDiagonal(int i, int j, int x, int y);
     list<Tablero> getEatReina(int i, int j);
     int cantPiezas(bool jugador);
-    bool verificarReina(bool player);
     int heuristic(bool player1, bool player2);
     
     wchar_t tablero[10][10];

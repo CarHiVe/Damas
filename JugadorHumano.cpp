@@ -11,12 +11,12 @@ JugadorHumano::JugadorHumano(bool player){
     jugador = player;
 }
 
-Tablero JugadorHumano::movimiento(const Tablero& t){
+Tablero JugadorHumano::movimientoBlanca(const Tablero& t){
     bool accion = false;
     list<Tablero> auxiliar;
     
     wchar_t move[4];
-    wchar_t opcion;
+    wchar_t opcion, es = 9675;
     int desdeX;
     int desdeY;
     Tablero aux = Tablero(t);
@@ -43,7 +43,7 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
             /*Si la lista comer no está vacía, entonces comienza esta sección
             que sirve para comer*/
             if(!comer.empty()){
-                wcout << "Ingrese coordenadas (desde[x1][y1], hacia[x2][y2]): ";
+                wcout << "\nUsted es " << es << ". Ingrese coordenadas (por ejemplo: h4g3): ";
                 wcin >> setw(1) >> move[0];
                 wcin >> setw(1) >> move[1];
                 wcin >> setw(1) >> move[2];
@@ -311,7 +311,7 @@ Tablero JugadorHumano::movimiento(const Tablero& t){
                     }
                 } 
             }else{
-                wcout << "Ingrese coordenadas (desde[x1][y1], hacia[x2][y2]): ";
+                wcout << "\nUsted es " << es << ". Ingrese coordenadas (por ejemplo: h4g3): ";
                 wcin >> setw(1) >> move[0];
                 wcin >> setw(1) >> move[1];
                 wcin >> setw(1) >> move[2];
