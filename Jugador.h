@@ -16,7 +16,8 @@ using namespace std;
 class Jugador {
 public:
     Jugador(const Tablero& t, bool player, int prof);
-    Tablero& movimiento(bool player);
+    Tablero& movimientoNegra(bool player);
+    Tablero& movimientoBlanca(bool player);
     void Actualizar(const Tablero& t, int prof);
      
     Arbol miArbol;

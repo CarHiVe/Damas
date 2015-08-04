@@ -21,6 +21,7 @@ class JugadorHumano {
 public:
     JugadorHumano(bool player);
     Tablero movimientoBlanca(const Tablero& t);
+    Tablero movimientoNegra(const Tablero& t);
     
     bool jugador;
     int X1;
