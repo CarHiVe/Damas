@@ -9,6 +9,9 @@
 
 Tablero::Tablero() {
     setlocale(LC_CTYPE,"");
+    cuantasCome = 0;
+    reinaBlanca = false;
+    reinaNegra = false;
     for(int i=0;i<10;i++){
         for(int j=0;j<10;j++){
             if(i<3 && (i+j)%2 != 0){
@@ -31,6 +34,9 @@ Tablero::Tablero() {
 
 Tablero::Tablero(const Tablero& orig) {
     comer = orig.comer;
+    reinaBlanca = orig.reinaBlanca;
+    reinaNegra = orig.reinaNegra;
+    cuantasCome = orig.cuantasCome;
     ValPieza = orig.ValPieza;
     X1 = orig.X1;
     Y1 = orig.Y1;
@@ -52,7 +58,9 @@ Tablero::Tablero(const Tablero& t, int I, int J, int codigo){
             tablero2[i][j] = t.tablero2[i][j];
         }
     }
-    
+    reinaBlanca = t.reinaBlanca;
+    reinaNegra = t.reinaNegra;
+    cuantasCome = 0;
     int valorInt = tablero2[I][J];
     wchar_t valorChar = tablero[I][J];
     
@@ -134,10 +142,12 @@ Tablero::Tablero(const Tablero& t, int I, int J, int codigo){
     if(I==9 && valorInt == -1){
         tablero[I][J] = 9819;
         tablero2[I][J] *=2;
+        reinaNegra = true;
     }
     if(I==0 && valorInt == 1){
         tablero[I][J] = 9813;
         tablero2[I][J] *=2;
+        reinaBlanca = true;
     }
 }
 
@@ -149,7 +159,9 @@ Tablero::Tablero(const Tablero& t, int I1, int J1, int I2, int J2, int codigo){
             tablero2[i][j] = t.tablero2[i][j];
         }
     }
-    
+    reinaBlanca = t.reinaBlanca;
+    reinaNegra = t.reinaNegra;
+    cuantasCome = 0;
     int valorInt= tablero2[I1][J1];
     wchar_t valorChar = tablero[I1][J1];
     
@@ -202,15 +214,16 @@ Tablero::Tablero(const Tablero& t, int I1, int J1, int I2, int J2, int codigo){
     if(I2==9 && valorInt == -1){
         tablero[I2][J2] = 9819;
         tablero2[I2][J2] *=2;
+        reinaNegra = true;
     }
     if(I2==0 && valorInt == 1){
         tablero[I2][J2] = 9813;
         tablero2[I2][J2] *=2;
+        reinaBlanca = true;
     }
 }
 
 void Tablero::mostrar(){
-    
     wcout << "\t";
     for(int i=0;i<10;i++){
         wcout << i << "\t";
@@ -234,19 +247,23 @@ list<Tablero> Tablero::getMovimiento(bool player){
     for(int i=0;i<10;i++){
         for(int j=0;j<10;j++){
             if((player && tablero2[i][j] == 1) || (!player && tablero2[i][j] == -1)){
+                int ID = 0;
                 list<Tablero> aux; 
-                aux.operator=(this->getSalto(i, j, tablero2[i][j], 4));
+                aux.operator=(this->getSalto(i, j, tablero2[i][j], ID, 4));
                 list<Tablero>::iterator ini = aux.begin();
                 list<Tablero>::iterator fin = aux.end();
                 
+                
                 while(ini != fin){
+                    
                     moves.push_back(*ini);
                     ini++;
                 }
             }else{
                 if((player && tablero2[i][j] == 2) || (!player && tablero2[i][j] == -2)){
+                    int ID = 0;
                     list <Tablero> aux;
-                    aux.operator=(this->getEatReina(i, j));
+                    aux.operator=(this->getEatReina(i, j, ID));
                     list<Tablero>::iterator ini = aux.begin();
                     list<Tablero>::iterator fin = aux.end();
                     
@@ -394,41 +411,93 @@ list<Tablero> Tablero::getMovimiento(bool player){
         }
     }
     
+    list<Tablero>::iterator ini = moves.begin();
+    list<Tablero>::iterator fin = moves.end();
+    
+    list<Tablero> piezasComidas;
+    while(ini != fin){
+        if(player == true){
+            if(ini->reinaBlanca == true && ini->cuantasCome >= 2)
+                piezasComidas.push_back(*ini);
+        }else{
+            if(ini->reinaNegra == true && ini->cuantasCome >= 2)
+                piezasComidas.push_back(*ini);
+        }
+        ini++;
+    }
+    
+    if(piezasComidas.empty() == false)
+        return piezasComidas;
+    
     return moves;
 }
 
-list<Tablero> Tablero::getSalto(int i, int j, int pieza, int direccion){
+list<Tablero> Tablero::getSalto(int i, int j, int pieza,  int ptr, int direccion){
     list<Tablero> moves;
     if(pieza == 1 || pieza == 2 || pieza == -2){
         if(salto(i, j, i-1, j-1)){
+            
             Tablero nuevoTablero = Tablero(*this, i, j, 4);
+            nuevoTablero.cuantasCome = 1 + ptr;
             list <Tablero> saltosDerivados;
-            saltosDerivados.operator=(nuevoTablero.getSalto(i-2, j-2, pieza, 0));
+            saltosDerivados.operator=(nuevoTablero.getSalto(i-2, j-2, pieza,nuevoTablero.cuantasCome, 0));
             if(saltosDerivados.empty())
                 moves.push_back(nuevoTablero);
             else{
+                int cuentas = 0;
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
+                
                 while(ini != fin){
                     moves.push_back(*ini);
+                    if(ini->cuantasCome > cuentas)
+                       cuentas = ini->cuantasCome;
+                    
+                    ini++;
+                }
+                
+                ini = saltosDerivados.begin();
+                fin = saltosDerivados.end();
+                
+                while(ini != fin){
+                    if(ini->cuantasCome == cuentas)
+                        moves.push_back(*ini);
+                    
                     ini++;
                 }
             }
         }
         
         if(salto(i, j, i-1, j+1)){
+            
             Tablero nuevoTablero = Tablero(*this, i, j, 5);
+            nuevoTablero.cuantasCome = 1+ptr;
             list <Tablero> saltosDerivados;
-            saltosDerivados.operator=(nuevoTablero.getSalto(i-2, j+2, pieza, 1));
+            saltosDerivados.operator=(nuevoTablero.getSalto(i-2, j+2, pieza, nuevoTablero.cuantasCome, 1));
             if(saltosDerivados.empty())
                 moves.push_back(nuevoTablero);
             else{
+                int cuentas = 0;
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
+                
                 while(ini != fin){
                     moves.push_back(*ini);
+                    if(ini->cuantasCome > cuentas)
+                      cuentas = ini->cuantasCome;
                     ini++;
                 }
+                
+                ini = saltosDerivados.begin();
+                fin = saltosDerivados.end();
+                
+                while(ini != fin){
+                    if(ini->cuantasCome == cuentas)
+                        moves.push_back(*ini);
+                    
+                    ini++;
+                }
+                
             }
         }
     }
@@ -436,31 +505,64 @@ list<Tablero> Tablero::getSalto(int i, int j, int pieza, int direccion){
     if(pieza == -1 || pieza == -2 || pieza == 2){
         if(salto(i, j, i+1, j-1)){
             Tablero nuevoTablero = Tablero(*this, i, j, 6);
+            nuevoTablero.cuantasCome = 1+ ptr;
             list <Tablero> saltosDerivados;
-            saltosDerivados.operator=(nuevoTablero.getSalto(i+2, j-2, pieza, 2));
+            saltosDerivados.operator=(nuevoTablero.getSalto(i+2, j-2, pieza, nuevoTablero.cuantasCome, 2));
             if(saltosDerivados.empty())
                 moves.push_back(nuevoTablero);
-            else{    
+            else{  
+                int cuentas = 0;
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
+                
                 while(ini != fin){
                     moves.push_back(*ini);
+                    if(ini->cuantasCome > cuentas)
+                      cuentas = ini->cuantasCome;
+                    
                     ini++;
                 }
+                
+                ini = saltosDerivados.begin();
+                fin = saltosDerivados.end();
+                
+                while(ini != fin){
+                    if(ini->cuantasCome == cuentas)
+                        moves.push_back(*ini);
+                    
+                    ini++;
+                }
+                
             }
         }
         
         if(salto(i, j, i+1, j+1)){
             Tablero nuevoTablero = Tablero(*this, i, j, 7);
+            nuevoTablero.cuantasCome = 1+ ptr;
             list <Tablero> saltosDerivados;
-            saltosDerivados.operator=(nuevoTablero.getSalto(i+2, j+2, pieza, 3));
+            saltosDerivados.operator=(nuevoTablero.getSalto(i+2, j+2, pieza, nuevoTablero.cuantasCome, 3));
             if(saltosDerivados.empty())
                 moves.push_back(nuevoTablero);
             else{
+                int cuentas = 0;
                 list<Tablero>::iterator ini = saltosDerivados.begin();
                 list<Tablero>::iterator fin = saltosDerivados.end();
+                
                 while(ini != fin){
                     moves.push_back(*ini);
+                    if(ini->cuantasCome > cuentas)
+                      cuentas = ini->cuantasCome;
+                    
+                    ini++;
+                }
+                
+                ini = saltosDerivados.begin();
+                fin = saltosDerivados.end();
+                
+                while(ini != fin){
+                    if(ini->cuantasCome == cuentas)
+                        moves.push_back(*ini);
+                    
                     ini++;
                 }
             }
@@ -478,64 +580,56 @@ list<Tablero> Tablero::getMovimientoDerivado(int i, int j, int direccion){
         Tablero nuevoTablero = Tablero(*this,i,j,0);
         list<Tablero> der;
         der.operator=(nuevoTablero.getMovimientoDerivado(i-1, j-1, direccion));  
-        if(der.empty())
-            moves.push_back(nuevoTablero);
-        else{
-            list<Tablero>::iterator ini = der.begin();
-            list<Tablero>::iterator fin = der.end();
-            while(ini != fin){
-                moves.push_back(*ini);
-                ini++;
-            }
-        }      
+        moves.push_back(nuevoTablero);
+        
+        list<Tablero>::iterator ini = der.begin();
+        list<Tablero>::iterator fin = der.end();
+        while(ini != fin){
+            moves.push_back(*ini);
+            ini++;
+        }    
     }
         
     if(abierto(i-1, j+1) && (direccion == 1 || direccion == 4)){
         Tablero nuevoTablero = Tablero(*this,i,j,1);
         list<Tablero> der;
         der.operator=(nuevoTablero.getMovimientoDerivado(i-1, j+1, direccion));  
-        if(der.empty())
-            moves.push_back(nuevoTablero);
-        else{
-            list<Tablero>::iterator ini = der.begin();
-            list<Tablero>::iterator fin = der.end();
-            while(ini != fin){
-                moves.push_back(*ini);
-                ini++;
-            }
-        }   
+        moves.push_back(nuevoTablero);
+        
+        list<Tablero>::iterator ini = der.begin();
+        list<Tablero>::iterator fin = der.end();
+        while(ini != fin){
+            moves.push_back(*ini);
+            ini++;
+        }
     }
         
     if(abierto(i+1, j-1) && (direccion == 2 || direccion == 4)){
         Tablero nuevoTablero = Tablero(*this,i,j,2);
         list<Tablero> der;
         der.operator=(nuevoTablero.getMovimientoDerivado(i+1, j-1, direccion));
-        if(der.empty())
-            moves.push_back(nuevoTablero);
-        else{
-            list<Tablero>::iterator ini = der.begin();
-            list<Tablero>::iterator fin = der.end();
-            while(ini != fin){
-                moves.push_back(*ini);
-                ini++;
-            }
-        } 
+        moves.push_back(nuevoTablero);
+        
+        list<Tablero>::iterator ini = der.begin();
+        list<Tablero>::iterator fin = der.end();
+        while(ini != fin){
+            moves.push_back(*ini);
+            ini++;
+        }
     }
      
     if(abierto(i+1, j+1) && (direccion == 3 || direccion == 4)){
         Tablero nuevoTablero = Tablero(*this,i,j,3);
         list<Tablero> der;
         der.operator=(nuevoTablero.getMovimientoDerivado(i+1, j+1, direccion));
-        if(der.empty())
-            moves.push_back(nuevoTablero);
-        else{
-            list<Tablero>::iterator ini = der.begin();
-            list<Tablero>::iterator fin = der.end();
-            while(ini != fin){
-                moves.push_back(*ini);
-                ini++;
-            }
-        }   
+        moves.push_back(nuevoTablero);
+        
+        list<Tablero>::iterator ini = der.begin();
+        list<Tablero>::iterator fin = der.end();
+        while(ini != fin){
+            moves.push_back(*ini);
+            ini++;
+        }  
     }
     }
     return moves;
@@ -563,6 +657,9 @@ Tablero& Tablero::operator =(const Tablero& t){
                 this->tablero2[i][j] = t.tablero2[i][j];
             }
         }
+        this->cuantasCome = t.cuantasCome;
+        this->reinaBlanca = t.reinaBlanca;
+        this->reinaNegra = t.reinaNegra;
         this->X1 = t.X1;
         this->Y1 = t.Y1;
         this->X2 = t.X2;
@@ -673,7 +770,7 @@ int Tablero::enDiagonal(int i, int j, int x, int y){
 
 //Funcion para comer perteneciente a la reina
 
-list<Tablero> Tablero::getEatReina(int i, int j){
+list<Tablero> Tablero::getEatReina(int i, int j, int ptr){
     list<Tablero> moves;
     for(int x=0; x<10; x++){
         for(int y=0; y<10; y++){
@@ -706,15 +803,31 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                             }else{
                                 if(temporal->salto(X, Y, X-1, Y-1) && direccion == 0){
                                     temporal = new Tablero(*temporal, X, Y, 4);
+                                    temporal->cuantasCome = 1+ ptr;
                                     list<Tablero> derivados;
-                                    derivados.operator =(temporal->getEatReina(X-2, Y-2));
+                                    derivados.operator =(temporal->getEatReina(X-2, Y-2, temporal->cuantasCome));
                                     if(derivados.empty())
                                         moves.push_back(*temporal);
                                     else{
+                                        int cuentas = 0;
                                         list<Tablero>::iterator ini = derivados.begin();
                                         list<Tablero>::iterator fin = derivados.end();
+                
                                         while(ini != fin){
-                                            moves.push_back(*ini);
+                                            //moves.push_back(*ini);
+                                            if(ini->cuantasCome > cuentas)
+                                                cuentas = ini->cuantasCome;
+                    
+                                            ini++;
+                                        }
+                
+                                        ini = derivados.begin();
+                                        fin = derivados.end();
+                
+                                        while(ini != fin){
+                                            if(ini->cuantasCome == cuentas)
+                                                moves.push_back(*ini);
+                    
                                             ini++;
                                         }
                                     }
@@ -732,15 +845,31 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                     }else{
                                         if(temporal->salto(X, Y, X-1, Y+1) && direccion == 1){
                                             temporal = new Tablero(*temporal, X, Y, 5);
+                                            temporal->cuantasCome = 1+ ptr;
                                             list<Tablero> derivados;
-                                            derivados.operator =(temporal->getEatReina(X-2, Y+2));
+                                            derivados.operator =(temporal->getEatReina(X-2, Y+2, temporal->cuantasCome));
                                             if(derivados.empty())
                                                 moves.push_back(*temporal);
                                             else{
+                                                int cuentas = 0;
                                                 list<Tablero>::iterator ini = derivados.begin();
                                                 list<Tablero>::iterator fin = derivados.end();
+
                                                 while(ini != fin){
-                                                    moves.push_back(*ini);
+                                                    //moves.push_back(*ini);
+                                                    if(ini->cuantasCome > cuentas)
+                                                        cuentas = ini->cuantasCome;
+
+                                                    ini++;
+                                                }
+
+                                                ini = derivados.begin();
+                                                fin = derivados.end();
+
+                                                while(ini != fin){
+                                                    if(ini->cuantasCome == cuentas)
+                                                        moves.push_back(*ini);
+
                                                     ini++;
                                                 }
                                             }
@@ -757,15 +886,31 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                             }else{
                                                 if(temporal->salto(X, Y, X+1, Y-1) && direccion == 2){
                                                     temporal = new Tablero(*temporal, X, Y, 6);
+                                                    temporal->cuantasCome = 1+ ptr;
                                                     list<Tablero> derivados;
-                                                    derivados.operator =(temporal->getEatReina(X+2, Y-2));
+                                                    derivados.operator =(temporal->getEatReina(X+2, Y-2, temporal->cuantasCome));
                                                     if(derivados.empty())
                                                         moves.push_back(*temporal);
                                                     else{
+                                                        int cuentas = 0;
                                                         list<Tablero>::iterator ini = derivados.begin();
                                                         list<Tablero>::iterator fin = derivados.end();
+
                                                         while(ini != fin){
-                                                            moves.push_back(*ini);
+                                                            //moves.push_back(*ini);
+                                                            if(ini->cuantasCome > cuentas)
+                                                                cuentas = ini->cuantasCome;
+
+                                                            ini++;
+                                                        }
+
+                                                        ini = derivados.begin();
+                                                        fin = derivados.end();
+
+                                                        while(ini != fin){
+                                                            if(ini->cuantasCome == cuentas)
+                                                                moves.push_back(*ini);
+
                                                             ini++;
                                                         }
                                                     }
@@ -782,15 +927,31 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                                     }else{
                                                         if(temporal->salto(X, Y, X+1, Y+1) && direccion == 3){
                                                             temporal = new Tablero(*temporal, X, Y, 7);
+                                                            temporal->cuantasCome = 1+ ptr;
                                                             list<Tablero> derivados;
-                                                            derivados.operator =(temporal->getEatReina(X+2, Y+2));
+                                                            derivados.operator =(temporal->getEatReina(X+2, Y+2, temporal->cuantasCome));
                                                             if(derivados.empty())
                                                                 moves.push_back(*temporal);
                                                             else{
+                                                                int cuentas = 0;
                                                                 list<Tablero>::iterator ini = derivados.begin();
                                                                 list<Tablero>::iterator fin = derivados.end();
+
                                                                 while(ini != fin){
-                                                                    moves.push_back(*ini);
+                                                                    //moves.push_back(*ini);
+                                                                    if(ini->cuantasCome > cuentas)
+                                                                        cuentas = ini->cuantasCome;
+
+                                                                    ini++;
+                                                                }
+
+                                                                ini = derivados.begin();
+                                                                fin = derivados.end();
+
+                                                                while(ini != fin){
+                                                                    if(ini->cuantasCome == cuentas)
+                                                                        moves.push_back(*ini);
+
                                                                     ini++;
                                                                 }
                                                             }
@@ -838,15 +999,31 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                 }else{
                                     if(temporal->salto(X, Y, X-1, Y-1) && direccion == 0){
                                         temporal = new Tablero(*temporal, X, Y, 4);
+                                        temporal->cuantasCome = 1+ ptr;
                                         list<Tablero> derivados;
-                                        derivados.operator =(temporal->getEatReina(X-2, Y-2));
+                                        derivados.operator =(temporal->getEatReina(X-2, Y-2, temporal->cuantasCome));
                                         if(derivados.empty())
                                             moves.push_back(*temporal);
                                         else{
+                                            int cuentas = 0;
                                             list<Tablero>::iterator ini = derivados.begin();
                                             list<Tablero>::iterator fin = derivados.end();
+
                                             while(ini != fin){
-                                                moves.push_back(*ini);
+                                                //moves.push_back(*ini);
+                                                if(ini->cuantasCome > cuentas)
+                                                    cuentas = ini->cuantasCome;
+
+                                                ini++;
+                                            }
+
+                                            ini = derivados.begin();
+                                            fin = derivados.end();
+
+                                            while(ini != fin){
+                                                if(ini->cuantasCome == cuentas)
+                                                    moves.push_back(*ini);
+
                                                 ini++;
                                             }
                                         }
@@ -863,15 +1040,31 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                         }else{
                                             if(temporal->salto(X, Y, X-1, Y+1) && direccion == 1){
                                                 temporal = new Tablero(*temporal, X, Y, 5);
+                                                temporal->cuantasCome = 1+ ptr;
                                                 list<Tablero> derivados;
-                                                derivados.operator =(temporal->getEatReina(X-2, Y+2));
+                                                derivados.operator =(temporal->getEatReina(X-2, Y+2, temporal->cuantasCome));
                                                 if(derivados.empty())
                                                     moves.push_back(*temporal);
                                                 else{
+                                                    int cuentas = 0;
                                                     list<Tablero>::iterator ini = derivados.begin();
                                                     list<Tablero>::iterator fin = derivados.end();
+
                                                     while(ini != fin){
-                                                        moves.push_back(*ini);
+                                                        //moves.push_back(*ini);
+                                                        if(ini->cuantasCome > cuentas)
+                                                            cuentas = ini->cuantasCome;
+
+                                                        ini++;
+                                                    }
+
+                                                    ini = derivados.begin();
+                                                    fin = derivados.end();
+
+                                                    while(ini != fin){
+                                                        if(ini->cuantasCome == cuentas)
+                                                            moves.push_back(*ini);
+
                                                         ini++;
                                                     }
                                                 }
@@ -887,15 +1080,31 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                                 }else{
                                                     if(temporal->salto(X, Y, X+1, Y-1) && direccion == 2){
                                                         temporal = new Tablero(*temporal, X, Y, 6);
+                                                        temporal->cuantasCome = 1+ ptr;
                                                         list<Tablero> derivados;
-                                                        derivados.operator =(temporal->getEatReina(X+2, Y-2));
+                                                        derivados.operator =(temporal->getEatReina(X+2, Y-2, temporal->cuantasCome));
                                                         if(derivados.empty())
                                                             moves.push_back(*temporal);
                                                         else{
+                                                            int cuentas = 0;
                                                             list<Tablero>::iterator ini = derivados.begin();
                                                             list<Tablero>::iterator fin = derivados.end();
+
                                                             while(ini != fin){
-                                                                moves.push_back(*ini);
+                                                                //moves.push_back(*ini);
+                                                                if(ini->cuantasCome > cuentas)
+                                                                    cuentas = ini->cuantasCome;
+
+                                                                ini++;
+                                                            }
+
+                                                            ini = derivados.begin();
+                                                            fin = derivados.end();
+
+                                                            while(ini != fin){
+                                                                if(ini->cuantasCome == cuentas)
+                                                                    moves.push_back(*ini);
+
                                                                 ini++;
                                                             }
                                                         }
@@ -911,15 +1120,31 @@ list<Tablero> Tablero::getEatReina(int i, int j){
                                                         }else{
                                                             if(temporal->salto(X, Y, X+1, Y+1) && direccion == 3){
                                                                 temporal = new Tablero(*temporal, X, Y, 7);
+                                                                temporal->cuantasCome = 1+ ptr;
                                                                 list<Tablero> derivados;
-                                                                derivados.operator =(temporal->getEatReina(X+2, Y+2));
+                                                                derivados.operator =(temporal->getEatReina(X+2, Y+2, temporal->cuantasCome));
                                                                 if(derivados.empty())
                                                                     moves.push_back(*temporal);
                                                                 else{
+                                                                    int cuentas = 0;
                                                                     list<Tablero>::iterator ini = derivados.begin();
                                                                     list<Tablero>::iterator fin = derivados.end();
+
                                                                     while(ini != fin){
-                                                                        moves.push_back(*ini);
+                                                                        //moves.push_back(*ini);
+                                                                        if(ini->cuantasCome > cuentas)
+                                                                            cuentas = ini->cuantasCome;
+
+                                                                        ini++;
+                                                                    }
+
+                                                                    ini = derivados.begin();
+                                                                    fin = derivados.end();
+
+                                                                    while(ini != fin){
+                                                                        if(ini->cuantasCome == cuentas)
+                                                                            moves.push_back(*ini);
+
                                                                         ini++;
                                                                     }
                                                                 }
@@ -941,6 +1166,8 @@ list<Tablero> Tablero::getEatReina(int i, int j){
             }
         }
     }
+    
+    
     return moves;
 }
 

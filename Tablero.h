@@ -22,7 +22,7 @@ public:
     Tablero(const Tablero& t, int I1, int J1, int I2, int J2, int codigo);
     void mostrar();
     list<Tablero> getMovimiento(bool player);
-    list<Tablero> getSalto(int i, int j, int pieza, int direccion);
+    list<Tablero> getSalto(int i, int j, int pieza, int ptr, int direccion);
     list<Tablero> getMovimientoDerivado(int i, int j, int direccion);
     Tablero& operator =(const Tablero& t);
     
@@ -33,12 +33,15 @@ public:
     int signo(int f);
     bool equals(const Tablero& t);
     int enDiagonal(int i, int j, int x, int y);
-    list<Tablero> getEatReina(int i, int j);
+    list<Tablero> getEatReina(int i, int j, int ptr);
     int cantPiezas(bool jugador);
     int heuristic(bool player1, bool player2);
     
     wchar_t tablero[10][10];
     int tablero2[10][10];
+    int cuantasCome;
+    bool reinaBlanca;
+    bool reinaNegra;
     int comer;
     int ValPieza;
     int X1;

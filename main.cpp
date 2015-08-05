@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
         wcin.ignore(256,'\n'); 
         switch (opcion){
             case '1':{
+                system("clear");
                 ofstream moves;
                 string nombre_archivo = "Movimientos.txt";
     
@@ -52,9 +53,9 @@ int main(int argc, char** argv) {
      
                 while(!tab->juegoTerminado(player)){ //Mientras hayan movimientos disponibles
                     tab->mostrar();
-        
+                    usleep(800000);
                     tab->operator =(player? blanca.movimientoBlanca(*tab) : negra.movimientoNegra(false));
-        
+                    
                     if(player == true)
                         moves << "Blanca\tmovio de " << char(tab->X1+65) << tab->Y1 << " a " << char(tab->X2+65) << tab->Y2 << endl << endl;
                     else

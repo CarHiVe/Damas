@@ -27,6 +27,17 @@ Tablero& Jugador::movimientoNegra(bool player){
     list<Arbol>::iterator ini = miArbol.hijos.begin();
     list<Arbol>::iterator fin = miArbol.hijos.end();
     
+    int cuentas = 0;
+    while(ini != fin){
+        if(ini->tab->cuantasCome > cuentas)
+            cuentas = ini->tab->cuantasCome;
+        ini++;
+    }
+    
+    
+    ini = miArbol.hijos.begin();
+    fin = miArbol.hijos.end();
+    
     while(ini != fin){
         ganaOempate = 0;
         pierde = 0;
@@ -71,7 +82,7 @@ Tablero& Jugador::movimientoNegra(bool player){
                     if(ini2->tab->juegoTerminado(!player) || ini2->tab->cantPiezas(!player) < ini->tab->cantPiezas(!player) || ini2->tab->cantPiezas(!player) <= ini2->tab->cantPiezas(player))
                         seleccionados.push_back(*ini->tab);
                 }
-                if((ganaOempate*100)/totalNodos >= 80 || (pierde*100)/totalNodos <=20){
+                if((ganaOempate*100)/totalNodos >= 80 || (pierde*100)/totalNodos <=20 /*&& ini->tab->cuantasCome == cuentas*/){
                     seleccionados.push_back(*ini->tab);
                     gana.push_back(ganaOempate);
                     break;
