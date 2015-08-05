@@ -28,7 +28,7 @@ void Arbol::Brote(bool player){
     
     if(hijos.empty()){
         list<Tablero> moves;
-        moves.operator =(tab->getMovimiento(player));
+        moves.operator =(tab->getMovimiento(player, false));
         
         list<Tablero>::iterator ini = moves.begin();
         list<Tablero>::iterator fin = moves.end();

@@ -17,7 +17,6 @@ class Jugador {
 public:
     Jugador(const Tablero& t, bool player, int prof);
     Tablero& movimientoNegra(bool player);
-    Tablero& movimientoBlanca(bool player);
     void Actualizar(const Tablero& t, int prof);
      
     Arbol miArbol;
